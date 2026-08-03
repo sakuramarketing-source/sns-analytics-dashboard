@@ -22,13 +22,10 @@ const TOKEN = process.env.INSTAGRAM_ACCESS_TOKEN;
 const IG_USER_ID = process.env.INSTAGRAM_IG_USER_ID;
 const BASE = 'https://graph.facebook.com/v22.0';
 
-if (!TOKEN) {
-  console.error('❌ INSTAGRAM_ACCESS_TOKEN is not set');
-  process.exit(1);
-}
-if (!IG_USER_ID) {
-  console.error('❌ INSTAGRAM_IG_USER_ID is not set');
-  process.exit(1);
+if (!TOKEN || !IG_USER_ID) {
+  console.warn('⚠️ Instagram credentials not set. Skipping Instagram fetch.');
+  console.warn('   Set INSTAGRAM_ACCESS_TOKEN and INSTAGRAM_IG_USER_ID secrets to enable.');
+  process.exit(0);
 }
 
 async function fetchFromGraphAPI(path) {

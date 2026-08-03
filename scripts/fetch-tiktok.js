@@ -94,10 +94,17 @@ async function tiktokPost(path, body, token) {
 async function main() {
   console.log('🚀 TikTok fetch started at', new Date().toISOString());
 
+  // 認証情報がなければスキップ
+  if (!ACCESS_TOKEN && !REFRESH_TOKEN) {
+    console.warn('⚠️ TikTok credentials not set. Skipping TikTok fetch.');
+    console.warn('   Set TIKTOK_ACCESS_TOKEN or TIKTOK_REFRESH_TOKEN secret to enable.');
+    process.exit(0);
+  }
+
   const token = await refreshAccessToken();
   if (!token) {
-    console.error('❌ No TikTok access token available');
-    process.exit(1);
+    console.warn('⚠️ Could not obtain TikTok access token. Skipping.');
+    process.exit(0);
   }
 
   try {
