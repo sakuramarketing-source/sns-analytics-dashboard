@@ -6,9 +6,9 @@
 // === 状態 ===
 let state = {
   platform: 'all',
-  period: 'week',
-  weekOffset: 0,       // 0=今週, -1=前週
-  monthOffset: 0,      // 0=今月, -1=先月
+  period: 'all',        // デフォルトは全期間（データが少ないうちはこれが最適）
+  weekOffset: 0,
+  monthOffset: 0,
   metric: 'video_views',
 };
 
@@ -219,13 +219,17 @@ function updateComparison(range) {
 
 // === 最終更新 ===
 function updateLastUpdated() {
-  const rows = _rawData?.accounts;
-  if (rows && rows.length > 0) {
-    const last = rows[rows.length - 1];
-    $('#lastUpdated').textContent = last.fetched_at
-      ? new Date(last.fetched_at).toLocaleString('ja-JP')
-      : last.date;
+  // Phase 1: posts から最新日付を表示
+  const posts = _rawData?.posts;
+  if (posts && posts.length > 0) {
+    // 最新の投稿日時を取得
+    const sorted = [...posts].filter(p => p.post_date).sort((a, b) => b.post_date.localeCompare(a.post_date));
+    if (sorted.length > 0) {
+      $('#lastUpdated').textContent = sorted[0].post_date;
+      return;
+    }
   }
+  $('#lastUpdated').textContent = new Date().toLocaleDateString('ja-JP');
 }
 
 // === ユーティリティ ===

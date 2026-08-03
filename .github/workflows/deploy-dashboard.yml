@@ -3,7 +3,7 @@ name: ダッシュボードを Xserver にデプロイ
 on:
   push:
     branches: [main]
-    paths: ['dashboard/**']
+    paths: ['docs/**']
   workflow_dispatch:
 
 concurrency:
@@ -42,7 +42,7 @@ jobs:
             --exclude='node_modules' \
             --exclude='CLAUDE.md' \
             -e "ssh -i ~/.ssh/xserver_ci -p 10022" \
-            ./dashboard/ \
+            ./docs/ \
             ${{ secrets.XSERVER_USER }}@${{ secrets.XSERVER_HOST }}:${{ secrets.DASHBOARD_PATH }}/
 
       - name: Deploy complete
