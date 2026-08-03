@@ -5,6 +5,7 @@
   "type": "module",
   "description": "SNS metrics fetcher for Sakuradental Group",
   "dependencies": {
-    "google-spreadsheet": "^4.1.4"
+    "google-spreadsheet": "^4.1.4",
+    "google-auth-library": "^9.15.0"
   }
 }
