@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>さくら会 SNS分析</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" defer></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/charts.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <!-- ヘッダー -->
+  <header class="header">
+    <h1 class="header__title">🏥 さくら会 SNS分析</h1>
+    <div class="header__tabs" id="platformTabs">
+      <button class="tab active" data-platform="all">両方</button>
+      <button class="tab" data-platform="tiktok">TikTok</button>
+      <button class="tab" data-platform="instagram">Instagram</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- 期間切替 -->
+    <section class="period-selector">
+      <button class="period__arrow" id="prevWeek">←前週</button>
+      <div class="period__tabs">
+        <button class="tab active" data-period="week">週次</button>
+        <button class="tab" data-period="month">月次</button>
+        <button class="tab" data-period="all">全期間</button>
+      </div>
+      <button class="period__arrow" id="nextWeek">次週→</button>
+    </section>
+    <p class="period__range" id="periodRange">--</p>
+
+    <!-- ローディング -->
+    <div class="loading" id="loading">
+      <div class="loading__spinner"></div>
+      <p>データを読み込み中...</p>
+    </div>
+
+    <!-- エラー -->
+    <div class="error hidden" id="error">
+      <p>⚠️ データを読み込めませんでした</p>
+      <button class="btn" onclick="location.reload()">再読み込み</button>
+    </div>
+
+    <!-- KPIカード -->
+    <section class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card">
+        <p class="kpi-card__label">総再生</p>
+        <p class="kpi-card__value" id="kpiViews">--</p>
+        <p class="kpi-card__delta" id="kpiViewsDelta"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-card__label">いいね</p>
+        <p class="kpi-card__value" id="kpiLikes">--</p>
+        <p class="kpi-card__delta" id="kpiLikesDelta"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-card__label">フォロワー</p>
+        <p class="kpi-card__value" id="kpiFollowers">--</p>
+        <p class="kpi-card__delta" id="kpiFollowersDelta"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-card__label">平均 ER%</p>
+        <p class="kpi-card__value" id="kpiER">--</p>
+        <p class="kpi-card__delta" id="kpiERDelta"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-card__label">保存</p>
+        <p class="kpi-card__value" id="kpiSaves">--</p>
+        <p class="kpi-card__delta" id="kpiSavesDelta"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-card__label">シェア</p>
+        <p class="kpi-card__value" id="kpiShares">--</p>
+        <p class="kpi-card__delta" id="kpiSharesDelta"></p>
+      </div>
+    </section>
+
+    <!-- トレンドグラフ -->
+    <section class="chart-section">
+      <h2 class="section__title">📈 週間トレンド</h2>
+      <div class="chart__container">
+        <canvas id="trendChart"></canvas>
+      </div>
+      <div class="chart__toggle">
+        <button class="tab active" data-metric="video_views">再生回数</button>
+        <button class="tab" data-metric="likes">いいね</button>
+        <button class="tab" data-metric="comments">コメント</button>
+        <button class="tab" data-metric="engagement_rate">ER%</button>
+      </div>
+    </section>
+
+    <!-- TOP投稿 -->
+    <section class="top-posts">
+      <h2 class="section__title">🏆 人気投稿 TOP5</h2>
+      <div class="top-posts__list" id="topPosts">
+        <p class="empty">まだデータがありません</p>
+      </div>
+    </section>
+
+    <!-- 前週比較 -->
+    <section class="comparison" id="comparison">
+      <h2 class="section__title">📅 前週比較</h2>
+      <div class="comparison__grid" id="comparisonGrid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>最終更新: <span id="lastUpdated">--</span></p>
+    <p>データは毎日 20:30 に自動更新されます</p>
+  </footer>
+</body>
+</html>

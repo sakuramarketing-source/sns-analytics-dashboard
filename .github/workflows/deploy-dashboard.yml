@@ -1,0 +1,49 @@
+name: ダッシュボードを Xserver にデプロイ
+
+on:
+  push:
+    branches: [main]
+    paths: ['dashboard/**']
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dashboard-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.XSERVER_SSH_KEY }}" > ~/.ssh/xserver_ci
+          chmod 600 ~/.ssh/xserver_ci
+          echo "${{ secrets.XSERVER_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      - name: Ensure target directory exists
+        run: |
+          ssh -i ~/.ssh/xserver_ci -p 10022 \
+            ${{ secrets.XSERVER_USER }}@${{ secrets.XSERVER_HOST }} \
+            "mkdir -p ${{ secrets.DASHBOARD_PATH }}"
+
+      - name: Deploy dashboard files
+        run: |
+          rsync -az \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='.DS_Store' \
+            --exclude='scripts' \
+            --exclude='node_modules' \
+            --exclude='CLAUDE.md' \
+            -e "ssh -i ~/.ssh/xserver_ci -p 10022" \
+            ./dashboard/ \
+            ${{ secrets.XSERVER_USER }}@${{ secrets.XSERVER_HOST }}:${{ secrets.DASHBOARD_PATH }}/
+
+      - name: Deploy complete
+        run: echo "✅ Dashboard deployed to ${{ secrets.DASHBOARD_PATH }}"
