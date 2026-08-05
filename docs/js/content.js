@@ -87,18 +87,18 @@ function renderProgress() {
 }
 
 function renderSchedule() {
-  // 今週の月〜金を生成
   const days = getWeekdays();
   const el = document.getElementById('scheduleTable');
 
   el.innerHTML = days.map(d => {
     const row = _schedule.find(r => r['日付'] === d.dateStr);
     if (row) {
+      const posted = row['投稿後URL'] ? true : false;
       return `
         <div class="schedule-row">
           <span class="schedule-row__day">${d.label}</span>
           <span style="flex:1">${esc(row['企画タイトル'] || '--')}</span>
-          <span class="schedule-row__status ${row['ステータス'] === '確定' ? 'confirmed' : 'pending'}">${row['ステータス'] || '--'}</span>
+          <span class="schedule-row__status ${posted ? 'confirmed' : 'pending'}">${posted ? '投稿済' : '予定'}</span>
         </div>
       `;
     }
