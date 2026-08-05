@@ -19,6 +19,7 @@ const $$ = (sel) => document.querySelectorAll(sel);
 // === 初期化 ===
 document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
+  setupNavTabs();
   try {
     await loadAllData();
     refresh();
@@ -27,6 +28,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     $('#error').classList.remove('hidden');
   }
 });
+
+// === ナビタブ切替（分析 ↔ コンテンツ管理） ===
+function setupNavTabs() {
+  $$('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      $$('.nav-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const view = tab.dataset.view;
+      if (view === 'analytics') {
+        $('#viewAnalytics').classList.remove('hidden');
+        $('#viewContent').classList.add('hidden');
+      } else {
+        $('#viewAnalytics').classList.add('hidden');
+        $('#viewContent').classList.remove('hidden');
+        // コンテンツ管理のデータを読み込み
+        const ok = await loadContentData();
+        if (ok) renderContent();
+        else {
+          document.getElementById('stockList').innerHTML = '<p class="empty">データを読み込めませんでした。Google Sheets に pipeline / schedule シートがあるか確認してください。</p>';
+          document.getElementById('progressList').innerHTML = '';
+          document.getElementById('scheduleTable').innerHTML = '';
+        }
+      }
+    });
+  });
+}
 
 // === イベントリスナー ===
 function setupEventListeners() {

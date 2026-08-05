@@ -10,21 +10,27 @@
   <script src="js/config.js" defer></script>
   <script src="js/data.js" defer></script>
   <script src="js/charts.js" defer></script>
+  <script src="js/content.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
   <!-- ヘッダー -->
   <header class="header">
     <h1 class="header__title">🏥 さくら会 SNS分析</h1>
-    <div class="header__tabs" id="platformTabs">
+    <nav class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-view="analytics">📊 分析</button>
+      <button class="nav-tab" data-view="content">📋 コンテンツ管理</button>
+    </nav>
+  </header>
+
+  <!-- ============ 分析ビュー ============ -->
+  <main class="main view" id="viewAnalytics">
+    <section class="header__tabs" id="platformTabs">
       <button class="tab active" data-platform="all">両方</button>
       <button class="tab" data-platform="tiktok">TikTok</button>
       <button class="tab" data-platform="instagram">Instagram</button>
-    </div>
-  </header>
+    </section>
 
-  <main class="main">
-    <!-- 期間切替 -->
     <section class="period-selector">
       <button class="period__arrow" id="prevWeek">←前週</button>
       <div class="period__tabs">
@@ -36,58 +42,21 @@
     </section>
     <p class="period__range" id="periodRange">--</p>
 
-    <!-- ローディング -->
-    <div class="loading" id="loading">
-      <div class="loading__spinner"></div>
-      <p>データを読み込み中...</p>
-    </div>
+    <div class="loading" id="loading"><div class="loading__spinner"></div><p>読み込み中...</p></div>
+    <div class="error hidden" id="error"><p>⚠️ データを読み込めませんでした</p><button class="btn" onclick="location.reload()">再読み込み</button></div>
 
-    <!-- エラー -->
-    <div class="error hidden" id="error">
-      <p>⚠️ データを読み込めませんでした</p>
-      <button class="btn" onclick="location.reload()">再読み込み</button>
-    </div>
-
-    <!-- KPIカード -->
     <section class="kpi-grid" id="kpiGrid">
-      <div class="kpi-card">
-        <p class="kpi-card__label">総再生</p>
-        <p class="kpi-card__value" id="kpiViews">--</p>
-        <p class="kpi-card__delta" id="kpiViewsDelta"></p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-card__label">いいね</p>
-        <p class="kpi-card__value" id="kpiLikes">--</p>
-        <p class="kpi-card__delta" id="kpiLikesDelta"></p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-card__label">フォロワー</p>
-        <p class="kpi-card__value" id="kpiFollowers">--</p>
-        <p class="kpi-card__delta" id="kpiFollowersDelta"></p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-card__label">平均 ER%</p>
-        <p class="kpi-card__value" id="kpiER">--</p>
-        <p class="kpi-card__delta" id="kpiERDelta"></p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-card__label">保存</p>
-        <p class="kpi-card__value" id="kpiSaves">--</p>
-        <p class="kpi-card__delta" id="kpiSavesDelta"></p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-card__label">シェア</p>
-        <p class="kpi-card__value" id="kpiShares">--</p>
-        <p class="kpi-card__delta" id="kpiSharesDelta"></p>
-      </div>
+      <div class="kpi-card"><p class="kpi-card__label">総再生</p><p class="kpi-card__value" id="kpiViews">--</p><p class="kpi-card__delta" id="kpiViewsDelta"></p></div>
+      <div class="kpi-card"><p class="kpi-card__label">いいね</p><p class="kpi-card__value" id="kpiLikes">--</p><p class="kpi-card__delta" id="kpiLikesDelta"></p></div>
+      <div class="kpi-card"><p class="kpi-card__label">フォロワー</p><p class="kpi-card__value" id="kpiFollowers">--</p><p class="kpi-card__delta" id="kpiFollowersDelta"></p></div>
+      <div class="kpi-card"><p class="kpi-card__label">平均 ER%</p><p class="kpi-card__value" id="kpiER">--</p><p class="kpi-card__delta" id="kpiERDelta"></p></div>
+      <div class="kpi-card"><p class="kpi-card__label">保存</p><p class="kpi-card__value" id="kpiSaves">--</p><p class="kpi-card__delta" id="kpiSavesDelta"></p></div>
+      <div class="kpi-card"><p class="kpi-card__label">シェア</p><p class="kpi-card__value" id="kpiShares">--</p><p class="kpi-card__delta" id="kpiSharesDelta"></p></div>
     </section>
 
-    <!-- トレンドグラフ -->
     <section class="chart-section">
       <h2 class="section__title">📈 週間トレンド</h2>
-      <div class="chart__container">
-        <canvas id="trendChart"></canvas>
-      </div>
+      <div class="chart__container"><canvas id="trendChart"></canvas></div>
       <div class="chart__toggle">
         <button class="tab active" data-metric="video_views">再生回数</button>
         <button class="tab" data-metric="likes">いいね</button>
@@ -96,24 +65,74 @@
       </div>
     </section>
 
-    <!-- TOP投稿 -->
     <section class="top-posts">
       <h2 class="section__title">🏆 人気投稿 TOP5</h2>
-      <div class="top-posts__list" id="topPosts">
-        <p class="empty">まだデータがありません</p>
-      </div>
+      <div class="top-posts__list" id="topPosts"><p class="empty">まだデータがありません</p></div>
     </section>
 
-    <!-- 前週比較 -->
     <section class="comparison" id="comparison">
       <h2 class="section__title">📅 前週比較</h2>
       <div class="comparison__grid" id="comparisonGrid"></div>
     </section>
   </main>
 
+  <!-- ============ コンテンツ管理ビュー ============ -->
+  <main class="main view hidden" id="viewContent">
+    <!-- 完成在庫 -->
+    <section class="cm-section">
+      <h2 class="section__title">✅ 完成在庫（今すぐ投稿できる動画）</h2>
+      <div class="cm-grid" id="stockList"><p class="empty">在庫がありません</p></div>
+    </section>
+
+    <!-- 進行中 -->
+    <section class="cm-section">
+      <h2 class="section__title">📝 進行中</h2>
+      <div class="cm-grid" id="progressList"><p class="empty">進行中の企画はありません</p></div>
+    </section>
+
+    <!-- 投稿予定 -->
+    <section class="cm-section">
+      <h2 class="section__title">📅 今週の投稿予定</h2>
+      <div class="schedule-table" id="scheduleTable"><p class="empty">予定がありません</p></div>
+    </section>
+
+    <!-- 新規企画追加フォーム -->
+    <section class="cm-section">
+      <button class="btn btn--full" id="showAddForm">+ 新規企画を追加</button>
+      <div class="add-form hidden" id="addForm">
+        <input type="text" id="addTitle" placeholder="企画タイトル" class="input">
+        <div class="form-row">
+          <select id="addCategory" class="input"><option>施術</option><option>あるある</option><option>教育</option><option>商品紹介</option><option>採用</option><option>エンタメ</option><option>その他</option></select>
+          <select id="addStatus" class="input"><option>企画案</option><option>台本作成中</option><option>撮影待ち</option><option>撮影済み</option><option>編集中</option><option>完成✅</option></select>
+          <select id="addPriority" class="input"><option>中</option><option>高</option><option>低</option></select>
+        </div>
+        <button class="btn" id="saveAdd">保存</button>
+        <button class="btn btn--ghost" id="cancelAdd">キャンセル</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 編集モーダル -->
+  <div class="modal hidden" id="editModal">
+    <div class="modal__content">
+      <h3>企画を編集</h3>
+      <input type="hidden" id="editRowIndex">
+      <input type="text" id="editTitle" class="input" placeholder="企画タイトル">
+      <div class="form-row">
+        <select id="editCategory" class="input"><option>施術</option><option>あるある</option><option>教育</option><option>商品紹介</option><option>採用</option><option>エンタメ</option><option>その他</option></select>
+        <select id="editStatus" class="input"><option>企画案</option><option>台本作成中</option><option>撮影待ち</option><option>撮影済み</option><option>編集中</option><option>完成✅</option><option>投稿済み</option><option>ボツ</option></select>
+      </div>
+      <input type="date" id="editScheduleDate" class="input" placeholder="投稿予定日">
+      <select id="editPriority" class="input"><option>中</option><option>高</option><option>低</option></select>
+      <div class="modal__actions">
+        <button class="btn" id="saveEdit">保存</button>
+        <button class="btn btn--ghost" id="closeEdit">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <p>最終更新: <span id="lastUpdated">--</span></p>
-    <p>データは毎日 20:30 に自動更新されます</p>
   </footer>
 </body>
 </html>
