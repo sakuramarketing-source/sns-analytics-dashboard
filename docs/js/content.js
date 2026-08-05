@@ -11,7 +11,7 @@ const GAS = CONFIG.gasUrl;
 
 // === API通信 ===
 async function gasGet(sheet) {
-  const res = await fetch(`${GAS}?action=${sheet}`);
+  const res = await fetch(`${GAS}?action=${sheet}&t=${Date.now()}`);
   return res.json();
 }
 async function gasPost(data) {

@@ -42,13 +42,12 @@ function setupNavTabs() {
       } else {
         $('#viewAnalytics').classList.add('hidden');
         $('#viewContent').classList.remove('hidden');
-        // コンテンツ管理のデータを読み込み
+        // コンテンツ管理のデータを毎回読み込み
         const ok = await loadContentData();
         if (ok) renderContent();
         else {
-          document.getElementById('stockList').innerHTML = '<p class="empty">データを読み込めませんでした。Google Sheets に pipeline / schedule シートがあるか確認してください。</p>';
-          document.getElementById('progressList').innerHTML = '';
-          document.getElementById('scheduleTable').innerHTML = '';
+          document.getElementById('pipelineList').innerHTML = '<p class="empty">データを読み込めませんでした。pipeline / schedule シートを確認してください。</p>';
+          document.getElementById('calendarStrip').innerHTML = '';
         }
       }
     });
