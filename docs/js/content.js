@@ -43,13 +43,16 @@ function renderCalendar() {
   const days = getWeekdays();
   const el = document.getElementById('calendarStrip');
   el.innerHTML = days.map(d => {
-    const row = _schedule.find(r => r['日付'] === d.dateStr);
-    const cls = row ? 'has-post' : '';
+    // schedule シート + pipeline の投稿予定日 両方から探す
+    const sRow = _schedule.find(r => r['日付'] === d.dateStr);
+    const pRow = _pipeline.find(r => r['投稿予定日'] === d.dateStr);
+    const title = sRow?.['企画タイトル'] || pRow?.['企画タイトル'] || '';
+    const has = !!title;
     const today = d.dateStr === new Date().toISOString().split('T')[0] ? ' today' : '';
     return `
-      <div class="calendar-day ${cls}${today}">
+      <div class="calendar-day ${has ? 'has-post' : ''}${today}">
         <p class="calendar-day__label">${d.label}</p>
-        <p class="calendar-day__title">${row ? esc(row['企画タイトル'] || '投稿あり') : '--'}</p>
+        <p class="calendar-day__title">${has ? esc(title) : '--'}</p>
       </div>
     `;
   }).join('');
@@ -95,8 +98,8 @@ function getWeekdays() {
   const day = now.getDay();
   const monday = new Date(now);
   monday.setDate(now.getDate() - ((day + 6) % 7));
-  const labels = ['月','火','水','木','金'];
-  return Array.from({length:5}, (_, i) => {
+  const labels = ['月','火','水','木','金','土','日'];
+  return Array.from({length:7}, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     return {
