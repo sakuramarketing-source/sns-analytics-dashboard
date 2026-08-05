@@ -78,25 +78,27 @@
 
   <!-- ============ コンテンツ管理ビュー ============ -->
   <main class="main view hidden" id="viewContent">
-    <!-- 完成在庫 -->
-    <section class="cm-section">
-      <h2 class="section__title">✅ 完成在庫（今すぐ投稿できる動画）</h2>
-      <div class="cm-grid" id="stockList"><p class="empty">在庫がありません</p></div>
-    </section>
-
-    <!-- 進行中 -->
-    <section class="cm-section">
-      <h2 class="section__title">📝 進行中</h2>
-      <div class="cm-grid" id="progressList"><p class="empty">進行中の企画はありません</p></div>
-    </section>
-
-    <!-- 投稿予定 -->
+    <!-- 今週のカレンダー -->
     <section class="cm-section">
       <h2 class="section__title">📅 今週の投稿予定</h2>
-      <div class="schedule-table" id="scheduleTable"><p class="empty">予定がありません</p></div>
+      <div class="calendar-strip" id="calendarStrip"></div>
     </section>
 
-    <!-- 新規企画追加フォーム -->
+    <!-- ステータスフィルタ -->
+    <section class="filter-bar">
+      <button class="filter-tab active" data-filter="all">すべて</button>
+      <button class="filter-tab" data-filter="完成">完成</button>
+      <button class="filter-tab" data-filter="progress">進行中</button>
+      <button class="filter-tab" data-filter="投稿済み">投稿済み</button>
+      <button class="filter-tab" data-filter="ボツ">ボツ</button>
+    </section>
+
+    <!-- 企画一覧 -->
+    <section class="cm-section">
+      <div class="cm-grid" id="pipelineList"><p class="empty">企画がありません</p></div>
+    </section>
+
+    <!-- 新規追加 -->
     <section class="cm-section">
       <button class="btn btn--full" id="showAddForm">+ 新規企画を追加</button>
       <div class="add-form hidden" id="addForm">
