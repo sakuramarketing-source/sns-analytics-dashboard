@@ -112,7 +112,6 @@ function refresh() {
   updateChart(range);
   updateTopPosts(range);
   updateComparison(range);
-  updateLastUpdated();
 }
 
 function getCurrentRange() {
