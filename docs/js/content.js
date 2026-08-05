@@ -46,7 +46,7 @@ function renderContent() {
 }
 
 function renderStock() {
-  const stock = _pipeline.filter(r => r['ステータス'] === '完成✅');
+  const stock = _pipeline.filter(r => r['ステータス'] === '完成');
   const el = document.getElementById('stockList');
   if (stock.length === 0) {
     el.innerHTML = '<p class="empty">在庫がありません。「+ 新規企画を追加」から登録してください</p>';
@@ -65,14 +65,14 @@ function renderStock() {
 }
 
 function renderProgress() {
-  const progress = _pipeline.filter(r => r['ステータス'] !== '完成✅' && r['ステータス'] !== '投稿済み' && r['ステータス'] !== 'ボツ');
+  const progress = _pipeline.filter(r => r['ステータス'] !== '完成' && r['ステータス'] !== '投稿済み' && r['ステータス'] !== 'ボツ');
   const el = document.getElementById('progressList');
   if (progress.length === 0) {
     el.innerHTML = '<p class="empty">進行中の企画はありません</p>';
     return;
   }
   el.innerHTML = progress.map(r => {
-    const statusClass = r['ステータス'] === '企画案' ? 'idea' : 'progress';
+    const statusClass = r['ステータス'] === '企画' ? 'idea' : 'progress';
     return `
       <div class="cm-card" onclick="openEdit('${r['企画ID'] || ''}')">
         <span class="cm-card__status ${statusClass}">${r['ステータス'] || '企画案'}</span>
@@ -144,23 +144,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('showAddForm')?.addEventListener('click', showAddForm);
   document.getElementById('cancelAdd')?.addEventListener('click', hideAddForm);
   document.getElementById('saveAdd')?.addEventListener('click', async () => {
+    const btn = document.getElementById('saveAdd');
     const title = document.getElementById('addTitle').value.trim();
     if (!title) return alert('タイトルを入力してください');
+    btn.textContent = '保存中...';
+    btn.disabled = true;
     const now = new Date().toISOString().split('T')[0];
     const id = 'C' + now.replace(/-/g, '') + '-' + String(_pipeline.length + 1).padStart(2, '0');
     const row = [
-      id,
-      title,
+      id, title,
       document.getElementById('addCategory').value,
       document.getElementById('addStatus').value,
-      '', // 担当
-      now,
-      '', // 完成予定日
-      '', // 投稿予定日
-      document.getElementById('addPriority').value,
-      '', // 備考
+      '', now, '', '', '', // 担当, 企画日, 完成予定日, 投稿予定日, 備考
     ];
     await gasPost({ action: 'add', sheet: 'pipeline', row });
+    btn.textContent = '保存';
+    btn.disabled = false;
     hideAddForm();
     await refreshContent();
   });
@@ -174,9 +173,8 @@ function openEdit(planId) {
   document.getElementById('editRowIndex').value = idx + 2; // 1-indexed + header
   document.getElementById('editTitle').value = row['企画タイトル'] || '';
   document.getElementById('editCategory').value = row['カテゴリ'] || '施術';
-  document.getElementById('editStatus').value = row['ステータス'] || '企画案';
+  document.getElementById('editStatus').value = row['ステータス'] || '企画';
   document.getElementById('editScheduleDate').value = row['投稿予定日'] || '';
-  document.getElementById('editPriority').value = row['優先度'] || '中';
   document.getElementById('editModal').classList.remove('hidden');
 }
 
@@ -185,11 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('editModal').classList.add('hidden');
   });
   document.getElementById('saveEdit')?.addEventListener('click', async () => {
+    const btn = document.getElementById('saveEdit');
+    btn.textContent = '保存中...';
+    btn.disabled = true;
     const rowIndex = parseInt(document.getElementById('editRowIndex').value);
-    const orig = _pipeline[rowIndex - 2]; // 0-indexed from pipeline
-    const id = orig['企画ID'] || '';
+    const orig = _pipeline[rowIndex - 2];
     const row = [
-      id,
+      orig['企画ID'] || '',
       document.getElementById('editTitle').value,
       document.getElementById('editCategory').value,
       document.getElementById('editStatus').value,
@@ -197,10 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
       orig['企画日'] || '',
       orig['完成予定日'] || '',
       document.getElementById('editScheduleDate').value,
-      document.getElementById('editPriority').value,
+      orig['優先度'] || '',
       orig['備考'] || '',
     ];
     await gasPost({ action: 'update', sheet: 'pipeline', rowIndex, row });
+    btn.textContent = '保存';
+    btn.disabled = false;
     document.getElementById('editModal').classList.add('hidden');
     await refreshContent();
   });
