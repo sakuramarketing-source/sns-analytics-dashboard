@@ -138,6 +138,7 @@ function hideAddForm() {
   document.getElementById('showAddForm').classList.remove('hidden');
   document.getElementById('addForm').classList.add('hidden');
   document.getElementById('addTitle').value = '';
+  document.getElementById('addScheduleDate').value = '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -155,7 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
       id, title,
       document.getElementById('addCategory').value,
       document.getElementById('addStatus').value,
-      '', now, '', '', '', // 担当, 企画日, 完成予定日, 投稿予定日, 備考
+      '', now, '', // 担当, 企画日, 完成予定日
+      document.getElementById('addScheduleDate').value, // 投稿予定日
+      '', // 備考
     ];
     await gasPost({ action: 'add', sheet: 'pipeline', row });
     btn.textContent = '保存';
