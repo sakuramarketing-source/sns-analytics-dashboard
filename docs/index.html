@@ -78,10 +78,14 @@
 
   <!-- ============ コンテンツ管理ビュー ============ -->
   <main class="main view hidden" id="viewContent">
-    <!-- 今週のカレンダー -->
+    <!-- 月間カレンダー -->
     <section class="cm-section">
-      <h2 class="section__title">📅 今週の投稿予定</h2>
-      <div class="calendar-strip" id="calendarStrip"></div>
+      <div class="calendar-header">
+        <button class="calendar-header__nav" id="calPrev">←</button>
+        <span class="calendar-header__title" id="calTitle">2026年8月</span>
+        <button class="calendar-header__nav" id="calNext">→</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
     </section>
 
     <!-- ステータスフィルタ -->
