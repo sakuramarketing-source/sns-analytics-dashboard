@@ -17,6 +17,7 @@ async function loadContentData() {
     _pipeline = Papa.parse(pRaw, { header: true, skipEmptyLines: true }).data;
     _schedule = Papa.parse(sRaw, { header: true, skipEmptyLines: true }).data;
     _metrics = mRaw ? Papa.parse(mRaw, { header: true, skipEmptyLines: true }).data : [];
+    window._pipeline = _pipeline; // 他ビューから参照できるように
     return true;
   } catch (e) { console.warn(e); return false; }
 }
@@ -266,3 +267,4 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderContent() { renderCalendar(); renderPipeline(); }
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function formatNum(n) { if (!n) return '0'; const num = parseInt(n); if (num >= 10000) return (num/10000).toFixed(1)+'万'; if (num >= 1000) return (num/1000).toFixed(1)+'k'; return num.toLocaleString(); }
+window.esc = esc; window.formatNum = formatNum;

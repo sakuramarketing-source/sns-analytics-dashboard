@@ -36,18 +36,25 @@ function setupNavTabs() {
       $$('.nav-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       const view = tab.dataset.view;
+      // 全ビュー非表示
+      ['viewAnalytics','viewContent','viewMetrics'].forEach(id => $('#'+id).classList.add('hidden'));
+
       if (view === 'analytics') {
         $('#viewAnalytics').classList.remove('hidden');
-        $('#viewContent').classList.add('hidden');
-      } else {
-        $('#viewAnalytics').classList.add('hidden');
+      } else if (view === 'content') {
         $('#viewContent').classList.remove('hidden');
-        // コンテンツ管理のデータを毎回読み込み
         const ok = await loadContentData();
         if (ok) renderContent();
         else {
-          document.getElementById('pipelineList').innerHTML = '<p class="empty">データを読み込めませんでした。pipeline / schedule シートを確認してください。</p>';
-          document.getElementById('calendarStrip').innerHTML = '';
+          document.getElementById('pipelineList').innerHTML = '<p class="empty">pipeline / schedule シートを確認してください。</p>';
+          document.getElementById('calendarGrid').innerHTML = '';
+        }
+      } else if (view === 'metrics') {
+        $('#viewMetrics').classList.remove('hidden');
+        const ok = await loadMetrics();
+        if (ok) renderMetricsView();
+        else {
+          document.getElementById('metricsList').innerHTML = '<p class="empty">データを読み込めませんでした。</p>';
         }
       }
     });

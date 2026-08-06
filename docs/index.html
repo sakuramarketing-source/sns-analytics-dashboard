@@ -11,6 +11,7 @@
   <script src="js/data.js" defer></script>
   <script src="js/charts.js" defer></script>
   <script src="js/content.js" defer></script>
+  <script src="js/metrics.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -20,6 +21,7 @@
     <nav class="nav-tabs" id="navTabs">
       <button class="nav-tab active" data-view="analytics">📊 分析</button>
       <button class="nav-tab" data-view="content">📋 コンテンツ管理</button>
+      <button class="nav-tab" data-view="metrics">📈 投稿実績</button>
     </nav>
   </header>
 
@@ -115,6 +117,26 @@
         <button class="btn" id="saveAdd">保存</button>
         <button class="btn btn--ghost" id="cancelAdd">キャンセル</button>
       </div>
+    </section>
+  </main>
+
+  <!-- ============ 投稿実績ビュー ============ -->
+  <main class="main view hidden" id="viewMetrics">
+    <section class="kpi-grid" id="metricsKpiGrid">
+      <div class="kpi-card"><p class="kpi-card__label">総再生</p><p class="kpi-card__value" id="mViews">--</p></div>
+      <div class="kpi-card"><p class="kpi-card__label">平均ER%</p><p class="kpi-card__value" id="mER">--</p></div>
+      <div class="kpi-card"><p class="kpi-card__label">平均完走率</p><p class="kpi-card__value" id="mComp">--</p></div>
+      <div class="kpi-card"><p class="kpi-card__label">投稿数</p><p class="kpi-card__value" id="mCount">--</p></div>
+    </section>
+
+    <section class="chart-section">
+      <h2 class="section__title">📈 投稿別 パフォーマンス</h2>
+      <div class="chart__container"><canvas id="metricsChart"></canvas></div>
+    </section>
+
+    <section class="top-posts">
+      <h2 class="section__title">📋 投稿実績一覧</h2>
+      <div class="top-posts__list" id="metricsList"><p class="empty">まだデータがありません</p></div>
     </section>
   </main>
 
