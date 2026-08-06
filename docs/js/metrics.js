@@ -63,7 +63,7 @@ function renderMetricsView() {
               ? `<span style="font-size:0.72rem;color:var(--color-accent)">👁 ${fmt(v)} · ❤️ ${fmt(l)} · ER ${er}%</span>`
               : '<span style="font-size:0.7rem;color:#92400e">未入力</span>'}
           </div>
-          <div class="metrics-inputs-${id}-${pf}" style="display:${hasData ? 'none' : 'block'}">
+          <div class="metrics-inputs-${id}-${pf}" style="display:none">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
               <div><span style="font-size:0.6rem;color:var(--color-text-secondary)">再生数</span><input class="input" data-id="${id}" data-pf="${pf}" data-field="v" value="${v||''}" type="number" placeholder="0" style="padding:5px 6px;font-size:0.78rem;margin-bottom:1px" inputmode="numeric"></div>
               <div><span style="font-size:0.6rem;color:var(--color-text-secondary)">いいね</span><input class="input" data-id="${id}" data-pf="${pf}" data-field="l" value="${l||''}" type="number" placeholder="0" style="padding:5px 6px;font-size:0.78rem;margin-bottom:1px" inputmode="numeric"></div>
@@ -75,22 +75,24 @@ function renderMetricsView() {
             <button class="btn" style="width:100%;margin-top:4px;font-size:0.8rem;padding:6px"
               onclick="saveMetricsCard(event,'${id}','${pf}','${date}')">${hasData?'更新':'保存'}（${pf}）</button>
           </div>
-          ${hasData ? `<button class="btn btn--ghost" style="width:100%;font-size:0.7rem;margin-top:2px;padding:4px" onclick="toggleSection(event,'metrics-inputs-${id}-${pf}')">✏️ ${pf}を編集</button>` : ''}
+          <button class="btn btn--ghost" style="width:100%;font-size:0.7rem;margin-top:2px;padding:4px" onclick="toggleSection(event,'metrics-inputs-${id}-${pf}','${pf}')">${hasData ? `✏️ ${pf}を編集` : `📝 ${pf}を入力`}</button>
         </div>`;
       }).join('')}
     </div>`;
   }).join('');
 }
 
-function toggleSection(e, className) {
-  const card = e.target.closest('.metrics-card');
+function toggleSection(e, className, pf) {
+  const btn = e.target;
+  const card = btn.closest('.metrics-card');
   const inputs = card.querySelector(`.${className}`);
   if (inputs.style.display === 'none') {
     inputs.style.display = 'block';
-    e.target.textContent = e.target.textContent.replace('編集', '閉じる');
+    btn.textContent = `🔼 ${pf}を閉じる`;
   } else {
     inputs.style.display = 'none';
-    e.target.textContent = e.target.textContent.replace('閉じる', '編集');
+    const isEdit = btn.textContent.includes('閉じる');
+    btn.textContent = isEdit ? `✏️ ${pf}を編集` : `📝 ${pf}を入力`;
   }
 }
 

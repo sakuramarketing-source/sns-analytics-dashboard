@@ -542,4 +542,9 @@ select.input {
 }
 .modal__content h3 { margin-bottom: 12px; font-size: 1rem; }
 .modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
+/* 数値入力カード */
+.metrics-card {
+  border-left: 3px solid var(--color-accent);
+}
 .modal__actions .btn { min-width: 80px; }
