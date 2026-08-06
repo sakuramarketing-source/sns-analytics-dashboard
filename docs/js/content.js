@@ -51,10 +51,12 @@ function renderCalendar() {
     const pRow = _pipeline.find(r => r['投稿予定日'] === ds);
     const hasPost = !!(sRow || pRow);
     const isToday = ds === today;
+    const label = (sRow || pRow) ? esc(((sRow || pRow)['企画タイトル'] || '').substring(0, 6)) : '';
 
     html += `<div class="calendar-cell${hasPost ? ' has-post' : ''}${isToday ? ' today' : ''}"
       data-date="${ds}" onclick="onCalendarClick('${ds}')">
       <span class="calendar-cell__date">${d}</span>
+      ${label ? `<span class="calendar-cell__label">${label}</span>` : ''}
     </div>`;
   }
 
