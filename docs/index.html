@@ -129,6 +129,25 @@
         <select id="editStatus" class="input"><option>企画</option><option>撮影待ち</option><option>撮影済み</option><option>編集中</option><option>完成</option><option>投稿済み</option><option>ボツ</option></select>
       </div>
       <input type="date" id="editScheduleDate" class="input" placeholder="投稿予定日">
+
+      <!-- 数値入力（投稿済みの場合のみ表示） -->
+      <div class="metrics-block" id="metricsBlock" style="display:none">
+        <h4 style="margin:12px 0 6px;font-size:0.85rem">📊 パフォーマンス数値</h4>
+        <select id="editPlatform" class="input"><option>TikTok</option><option>Instagram</option></select>
+        <div class="form-row">
+          <input type="number" id="editViews" class="input" placeholder="再生数" inputmode="numeric">
+          <input type="number" id="editLikes" class="input" placeholder="いいね" inputmode="numeric">
+        </div>
+        <div class="form-row">
+          <input type="number" id="editComments" class="input" placeholder="コメント" inputmode="numeric">
+          <input type="number" id="editShares" class="input" placeholder="シェア" inputmode="numeric">
+        </div>
+        <div class="form-row">
+          <input type="number" id="editSaves" class="input" placeholder="保存" inputmode="numeric">
+          <input type="text" id="editCompletion" class="input" placeholder="完走率（例: 72%）">
+        </div>
+      </div>
+
       <div class="modal__actions">
         <button class="btn" id="saveEdit">保存</button>
         <button class="btn btn--ghost" id="closeEdit">キャンセル</button>

@@ -3,18 +3,20 @@
  * 読み取り: 公開CSV ／ 書き込み: GAS
  */
 
-let _pipeline = [], _schedule = [], _filter = 'all';
+let _pipeline = [], _schedule = [], _metrics = [], _filter = 'all';
 let _calYear, _calMonth;
 
 // === 読み取り ===
 async function loadContentData() {
   try {
-    const [pRaw, sRaw] = await Promise.all([
+    const [pRaw, sRaw, mRaw] = await Promise.all([
       fetch(CONFIG.pipelineCsv).then(r => r.text()),
       fetch(CONFIG.scheduleCsv).then(r => r.text()),
+      fetch(CONFIG.metricsCsv).then(r => r.text()).catch(() => ''),
     ]);
     _pipeline = Papa.parse(pRaw, { header: true, skipEmptyLines: true }).data;
     _schedule = Papa.parse(sRaw, { header: true, skipEmptyLines: true }).data;
+    _metrics = mRaw ? Papa.parse(mRaw, { header: true, skipEmptyLines: true }).data : [];
     return true;
   } catch (e) { console.warn(e); return false; }
 }
@@ -118,16 +120,18 @@ function renderPipeline() {
 
   const cls = { '企画':'idea', '撮影待ち':'progress', '撮影済み':'progress', '編集中':'progress', '完成':'done', '投稿済み':'posted', 'ボツ':'dead' };
 
-  el.innerHTML = filtered.map(r => `
+  el.innerHTML = filtered.map(r => {
+    const hasMetrics = _metrics.find(m => m['企画ID'] === r['企画ID']);
+    return `
     <div class="cm-card" style="align-items:flex-start" onclick="openEdit('${r['企画ID']||''}')">
       <span class="cm-card__status ${cls[r['ステータス']]||'idea'}">${r['ステータス']||'企画'}</span>
       <div class="cm-card__info">
         <p class="cm-card__title">${esc(r['企画タイトル'])}</p>
-        <p class="cm-card__meta">${r['カテゴリ']||''}${r['担当']?' · '+r['担当']:''}</p>
+        <p class="cm-card__meta">${r['カテゴリ']||''}${r['担当']?' · '+r['担当']:''}${hasMetrics ? ' · 👁 '+formatNum(hasMetrics['再生数']) : ''}</p>
       </div>
       ${r['投稿予定日'] ? `<span class="cm-card__date">📅 ${r['投稿予定日'].slice(5)}</span>` : ''}
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function filterPipeline(f) {
@@ -192,6 +196,24 @@ function openEdit(planId) {
   document.getElementById('editCategory').value = row['カテゴリ'] || '施術';
   document.getElementById('editStatus').value = row['ステータス'] || '企画';
   document.getElementById('editScheduleDate').value = row['投稿予定日'] || '';
+
+  // 投稿済みなら数値入力欄を表示、既存データを反映
+  const st = row['ステータス'] || '';
+  const block = document.getElementById('metricsBlock');
+  if (st === '投稿済み') {
+    block.style.display = 'block';
+    const m = _metrics.find(r => r['企画ID'] === planId);
+    document.getElementById('editViews').value = m?.['再生数'] || '';
+    document.getElementById('editLikes').value = m?.['いいね'] || '';
+    document.getElementById('editComments').value = m?.['コメント'] || '';
+    document.getElementById('editShares').value = m?.['シェア'] || '';
+    document.getElementById('editSaves').value = m?.['保存'] || '';
+    document.getElementById('editCompletion').value = m?.['完走率'] || '';
+    document.getElementById('editPlatform').value = m?.['プラットフォーム'] || 'TikTok';
+  } else {
+    block.style.display = 'none';
+  }
+
   document.getElementById('editModal').classList.remove('hidden');
 }
 
@@ -201,13 +223,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('saveEdit')?.addEventListener('click', async () => {
     const btn = document.getElementById('saveEdit'), ri = parseInt(document.getElementById('editRowIndex').value), orig = _pipeline[ri - 2];
+    const status = document.getElementById('editStatus').value;
+    const planId = orig['企画ID'] || '';
     btn.textContent = '保存中...'; btn.disabled = true;
+
+    // pipeline更新
     await gasPost({ action: 'update', sheet: 'pipeline', rowIndex: ri, row: [
-      orig['企画ID']||'', document.getElementById('editTitle').value,
-      document.getElementById('editCategory').value, document.getElementById('editStatus').value,
+      planId, document.getElementById('editTitle').value,
+      document.getElementById('editCategory').value, status,
       orig['担当']||'', orig['企画日']||'', orig['完成予定日']||'',
       document.getElementById('editScheduleDate').value,
       orig['優先度']||'', orig['備考']||'']});
+
+    // 投稿済みなら数値も保存
+    if (status === '投稿済み') {
+      const dateStr = document.getElementById('editScheduleDate').value || new Date().toISOString().split('T')[0];
+      const mRow = [
+        planId, dateStr,
+        document.getElementById('editPlatform').value,
+        document.getElementById('editViews').value || '0',
+        document.getElementById('editLikes').value || '0',
+        document.getElementById('editComments').value || '0',
+        document.getElementById('editShares').value || '0',
+        document.getElementById('editSaves').value || '0',
+        document.getElementById('editCompletion').value || '',
+      ];
+      // 既存のmetrics行を探して更新 / なければ追加
+      const existIdx = _metrics.findIndex(r => r['企画ID'] === planId);
+      if (existIdx >= 0) {
+        await gasPost({ action: 'update', sheet: 'metrics', rowIndex: existIdx + 2, row: mRow });
+      } else {
+        await gasPost({ action: 'add', sheet: 'metrics', row: mRow });
+      }
+    }
+
     btn.textContent = '保存済✅';
     setTimeout(() => { btn.textContent = '保存'; btn.disabled = false; document.getElementById('editModal').classList.add('hidden'); }, 1000);
     alert('保存しました！タブを切り替えると反映されます。');
@@ -216,3 +265,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function renderContent() { renderCalendar(); renderPipeline(); }
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function formatNum(n) { if (!n) return '0'; const num = parseInt(n); if (num >= 10000) return (num/10000).toFixed(1)+'万'; if (num >= 1000) return (num/1000).toFixed(1)+'k'; return num.toLocaleString(); }
