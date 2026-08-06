@@ -122,6 +122,14 @@
 
   <!-- ============ 投稿実績ビュー ============ -->
   <main class="main view hidden" id="viewMetrics">
+    <section class="period-selector" style="margin-top:0">
+      <span style="font-size:0.8rem;color:var(--color-text-secondary)">期間:</span>
+      <input type="date" id="mSince" class="input" style="width:auto;margin:0 4px;padding:6px 8px;font-size:0.75rem" onchange="applyMetricsFilter()">
+      <span style="font-size:0.8rem">〜</span>
+      <input type="date" id="mUntil" class="input" style="width:auto;margin:0 4px;padding:6px 8px;font-size:0.75rem" onchange="applyMetricsFilter()">
+      <button class="tab" onclick="resetMetricsFilter()" style="font-size:0.75rem">全期間</button>
+    </section>
+
     <section class="kpi-grid" id="metricsKpiGrid">
       <div class="kpi-card"><p class="kpi-card__label">総再生</p><p class="kpi-card__value" id="mViews">--</p></div>
       <div class="kpi-card"><p class="kpi-card__label">平均ER%</p><p class="kpi-card__value" id="mER">--</p></div>
