@@ -17,8 +17,8 @@ async function loadAllData() {
     if (mRaw) {
       const mData = Papa.parse(mRaw, { header: true, skipEmptyLines: true }).data;
       metricsPosts = mData.filter(r => r['企画ID']).map(r => ({
-        post_id: r['企画ID'] || '',
-        platform: (r['プラットフォーム'] || 'tiktok').toLowerCase(),
+        post_id: r['企画ID'] + '_' + (r['プラットフォーム'] || 'TikTok'),
+        platform: (r['プラットフォーム'] || 'TikTok').toLowerCase(),
         post_date: r['日付'] || '',
         caption: r['企画ID'] || '',
         permalink: '', thumbnail_url: '',
